@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect,useState } from "react"
 import {useRouter} from "next/navigation"
 import { Button } from "@/components/ui/button_create_account"
 import { Input } from "@/components/ui/input_create_account"
@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert_create_account"
 // CSRFトークンを取得するヘルパー関数
 function getCsrfToken() {
   const matches = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));
-  return matches ? decodeURIComponent(matches[2]) : null;
+  return matches ? decodeURIComponent(matches[2]) : undefined;
 }
 //a
 export function CreateAccount() {
@@ -21,18 +21,49 @@ export function CreateAccount() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
+
+  // CSRFトークンを取得するAPIを呼び出す処理
+const fetchCsrfToken = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/get_csrf_token', {
+      method: 'GET',
+      credentials: 'include', // クッキーを含める
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('CSRFトークンを取得:', data.csrf_token);
+      document.cookie = `csrf_token=${data.csrf_token}; path=/`; // CSRFトークンをクッキーに保存
+    } else {
+      console.error('CSRFトークンの取得に失敗しました');
+    }
+  } catch (error) {
+    console.error('エラーが発生しました:', error);
+  }
+};
+
+// コンポーネントがロードされた時にCSRFトークンを取得する
+useEffect(() => {
+  fetchCsrfToken();
+}, []);
+
 // サインインボタンをクリックしたときの処理
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
     // 基本的なバリデーション
     if (!userName || !userId || !password || !confirmPassword) {
-      setError("Please fill in all fields")
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match")
-    } else {
-      setError("")
-      console.log("Account creation attempted with:", { userName, userId, password })
+      setError("Please fill in all fields");
+      return; // エラーがあったらAPI呼び出しを中断
     }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return; // エラーがあったらAPI呼び出しを中断
+    }
+
+    setError(""); // エラーがない場合はエラーメッセージをクリア
+
+    console.log("Account creation attempted with:", { userName, userId, password });
 
     // CSRFトークンを取得
     const csrfToken = getCsrfToken();
@@ -42,7 +73,7 @@ export function CreateAccount() {
     };
   
     if (csrfToken) {
-      headers['X-CSRFToken'] = csrfToken; // CSRFトークンを含める
+      headers['X-CSRFToken'] = csrfToken ?? ''; // CSRFトークンを含める
     }
     // アカウント作成API呼び出し
     try{
@@ -62,7 +93,7 @@ export function CreateAccount() {
         const loginResponse = await fetch('http://localhost:5000/login',{
           method: 'POST',
           headers:{
-            'Content-Type':'applocation/json',
+            'Content-Type':'application/json',
           },
           body: JSON.stringify({user_id: userId,password})
         })

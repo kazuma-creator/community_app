@@ -14,6 +14,8 @@ main = Blueprint('main',__name__)
 
 # ユーザー登録
 @main.route('/register',methods=['POST'])
+@csrf.exempt # ログインではcsrfを無効にする
+
 def register():
   try:
     data = request.get_json()
