@@ -8,6 +8,11 @@ import { Label } from "@/components/ui/label_create_account"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card_create_account"
 import { Alert, AlertDescription } from "@/components/ui/alert_create_account"
 
+// CSRFトークンを取得するヘルパー関数
+function getCsrfToken() {
+  const matches = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));
+  return matches ? decodeURIComponent(matches[2]) : null;
+}
 //a
 export function CreateAccount() {
   const [userName, setUserName] = useState("")
@@ -28,13 +33,22 @@ export function CreateAccount() {
       setError("")
       console.log("Account creation attempted with:", { userName, userId, password })
     }
+
+    // CSRFトークンを取得
+    const csrfToken = getCsrfToken();
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+  
+    if (csrfToken) {
+      headers['X-CSRFToken'] = csrfToken; // CSRFトークンを含める
+    }
     // アカウント作成API呼び出し
     try{
       const response = await fetch('http://localhost:5000/register',{
         method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-        },
+        headers:headers,
         body: JSON.stringify({username: userName,user_id:userId,password}),
       })
 
