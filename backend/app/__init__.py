@@ -41,7 +41,7 @@ def create_app():
     return User.query.get(int(user_id))# データベースからユーザーを取得
   
   # ブループリントを登録
-  from app.routes import main
+  from .routes import main
   app.register_blueprint(main)
   
   
