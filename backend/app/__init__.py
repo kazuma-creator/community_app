@@ -32,7 +32,7 @@ def create_app():
   db.init_app(app)
   migrate.init_app(app,db)
   
-  from app.models import User
+  from .models import User
   
   # ユーザーローダーの定義
   @login_manager.user_loader
