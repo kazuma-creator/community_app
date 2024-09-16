@@ -9,9 +9,15 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     
     SESSION_TYPE = 'filesystem'
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    SESSION_COOKIE_SECURE = False
-
+    
+    if os.getenv('FLASK_ENV') == 'production':
+        SESSION_COOKIE_SAMESITE = 'None'
+        SESSION_COOKIE_SECURE = True
+    else:
+         # ローカル環境向けの設定
+        SESSION_COOKIE_SAMESITE = 'Lax'
+        SESSION_COOKIE_SECURE = False
+        
     # セッションの有効期限
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     REMEMBER_COOKIE_DURATION = timedelta(days=7)
