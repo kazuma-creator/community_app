@@ -1,10 +1,10 @@
 from flask import Blueprint,request,jsonify,make_response
-from app.models import Community,db,User,Post,Membership
+from .models import Community,db,User,Post,Membership
 import json
 from werkzeug.security import check_password_hash,generate_password_hash
 from flask_login import login_user,current_user,logout_user,login_required
 from flask_wtf.csrf import generate_csrf
-from app import csrf
+from . import csrf
 from flask import session
 
 
