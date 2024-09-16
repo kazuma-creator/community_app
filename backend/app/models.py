@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from app import db
+from . import db
 from flask_login import UserMixin
 import base64
 
