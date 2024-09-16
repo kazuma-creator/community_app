@@ -22,7 +22,7 @@ interface Notification {
   timestamp: string;
 }
 
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function HomePage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -35,7 +35,7 @@ export function HomePage() {
   // コミュニティデータを取得
   const fetchCommunities = async () => {
     try{
-      const response = await fetch('http://localhost:5000/api/get_communities');
+      const response = await fetch(`${API_URL}/api/get_communities`);
       const data = await response.json();
       console.log('コミュニティデータ:',data);
       setCommunities(data);
@@ -47,7 +47,7 @@ export function HomePage() {
   // 通知データを取得
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/notifications', {
+      const response = await fetch(`${API_URL}/api/notifications`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -60,7 +60,7 @@ export function HomePage() {
 
   const fetchMyCommunities = async () => {
     try{
-      const response = await fetch('http://localhost:5000/api/my_communities',{
+      const response = await fetch(`${API_URL}/api/my_communities`,{
         method:'GET',
         credentials:'include',
       });

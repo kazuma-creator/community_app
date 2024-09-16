@@ -37,11 +37,12 @@ export function CommunitySetupModal() {
   const [csrfToken,setCsrfToken] = useState<string | null>(null)
   const [generalError, setGeneralError] = useState<string | null>(null) 
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   // コンポーネントが開いたときの処理
   useEffect(()=>{
     const fetchUserId = async()=>{
       try{
-        const response = await fetch('http://localhost:5000/check_login',{
+        const response = await fetch(`${API_URL}/check_login`,{
           method:'GET',
           credentials: 'include',
         });
@@ -56,7 +57,7 @@ export function CommunitySetupModal() {
 
     const fetchCsrfToken = async () => {
       try{
-        const response = await fetch('http://localhost:5000/get_csrf_token',{
+        const response = await fetch(`${API_URL}/get_csrf_token`,{
           method:'GET',
           credentials:'include',
         });
@@ -118,7 +119,7 @@ export function CommunitySetupModal() {
 
     // バックエンドにデータを送信
     try{
-      const response = await fetch('http://localhost:5000/api/create_communities',{
+      const response = await fetch(`${API_URL}/api/create_communities`,{
         method: 'POST',
         body: formData,
         credentials: 'include',

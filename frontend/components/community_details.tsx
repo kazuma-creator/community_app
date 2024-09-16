@@ -22,6 +22,8 @@ export function CommunityApp() {
   const [isMember,setIsMember] = useState<boolean>(false);
   const params = useParams();  // クエリパラメーターを取得するフック
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const id = params?.id;  // クエリパラメーターから id を取得
   
     // CSRFトークンをクッキーから取得するヘルパー関数
@@ -33,7 +35,7 @@ export function CommunityApp() {
   // CSRFトークンを取得するAPIを呼び出す処理
   const fetchCsrfToken = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get_csrf_token', {
+      const response = await fetch(`${API_URL}/get_csrf_token`, {
         method: 'GET',
         credentials: 'include', // クッキーを含める
       });
@@ -63,7 +65,7 @@ export function CommunityApp() {
     // コミュニティの詳細データを取得
     const fetchCommunityDetail = async () =>{
       try{
-        const response = await fetch(`http://localhost:5000/api/community/${id}`);
+        const response = await fetch(`${API_URL}/api/community/${id}`);
         const data = await response.json();
         setCommunity(data);
       }catch(error){
@@ -72,7 +74,7 @@ export function CommunityApp() {
     };
     // ユーザーがコミュニティに参加しているか確認
     const checkMembership = async ()=>{
-      const response = await fetch(`http://localhost:5000/api/community/${id}/membership`,{
+      const response = await fetch(`${API_URL}/api/community/${id}/membership`,{
         method:'GET',
         credentials:'include',
       });
@@ -95,7 +97,7 @@ export function CommunityApp() {
         headers['X-CSRFToken'] = csrfToken;
       }
 
-      const response = await fetch(`http://localhost:5000/api/community/${id}/join`, {
+      const response = await fetch(`${API_URL}/api/community/${id}/join`, {
         method: 'POST',
         headers:headers,
         credentials: 'include',
@@ -129,7 +131,7 @@ export function CommunityApp() {
 
     // 投稿データを送信
     try{
-      const response = await fetch(`http://localhost:5000/api/community/${id}/posts`,{
+      const response = await fetch(`${API_URL}/api/community/${id}/posts`,{
         method:'POST',
         headers:headers,
         body:JSON.stringify({

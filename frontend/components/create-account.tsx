@@ -22,10 +22,12 @@ export function CreateAccount() {
   const [error, setError] = useState("")
   const router = useRouter()
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // CSRFトークンを取得するAPIを呼び出す処理
 const fetchCsrfToken = async () => {
   try {
-    const response = await fetch('http://localhost:5000/get_csrf_token', {
+    const response = await fetch(`${API_URL}/get_csrf_token`, {
       method: 'GET',
       credentials: 'include', // クッキーを含める
     });
@@ -41,6 +43,7 @@ const fetchCsrfToken = async () => {
     console.error('エラーが発生しました:', error);
   }
 };
+
 
 // コンポーネントがロードされた時にCSRFトークンを取得する
 useEffect(() => {
@@ -77,7 +80,7 @@ useEffect(() => {
     }
     // アカウント作成API呼び出し
     try{
-      const response = await fetch('http://localhost:5000/register',{
+      const response = await fetch(`${API_URL}/register`,{
         method:'POST',
         headers:headers,
         body: JSON.stringify({username: userName,user_id:userId,password}),
@@ -90,7 +93,7 @@ useEffect(() => {
         console.log("Account created:",data.message)
 
         // アカウント作成後、自動ログイン処理
-        const loginResponse = await fetch('http://localhost:5000/login',{
+        const loginResponse = await fetch(`${API_URL}/login`,{
           method: 'POST',
           headers:{
             'Content-Type':'application/json',

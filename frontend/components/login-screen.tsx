@@ -15,6 +15,9 @@ export function LoginScreen() {
   const [success,setSuccess] = useState("")
 
   const router = useRouter()
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  //console.log('NEXT_PUBLIC_API_URL:',process.env.NEXT_PUBLIC_API_URL)
   // サインインボタンがクリックされたときの処理
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +30,7 @@ export function LoginScreen() {
       // You would typically make an API call here to authenticate the user
     }
     try{
-      const response = await fetch('http://localhost:5000/login',{
+      const response = await fetch(`${API_URL}/login`,{
         method: 'POST',
         headers:{
           'Content-Type':'application/json',
