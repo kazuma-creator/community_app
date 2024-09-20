@@ -31,6 +31,8 @@ export function HomePage() {
   const [isNotificationsVisible, setIsNotificationsVisible] = useState(false);
   const [isMyCommunities,setIsMyCommunities] = useState(false);
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [noResults,setNoResults] = useState(false);
 
   // コミュニティデータを取得
   const fetchCommunities = async () => {
@@ -39,6 +41,7 @@ export function HomePage() {
       const data = await response.json();
       console.log('コミュニティデータ:',data);
       setCommunities(data);
+      setNoResults(false); // コミュニティ取得時は検索結果をリセット
     }catch(error){
       // エラー処理
       console.error('コミュニティの取得に失敗しました',error);
@@ -57,6 +60,47 @@ export function HomePage() {
       console.error('通知の取得に失敗しました', error);
     }
   };
+  // APIリクエストでコミュニティを検索
+  const searchCommunities = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/search_communities?q=${searchTerm}`);
+      const data = await response.json();
+      setCommunities(data);
+      
+      // 検索結果が空の場合はnoResultsをtrueに設定
+      if (data.length === 0) {
+        setNoResults(true);
+      } else {
+        setNoResults(false);
+      }
+    } catch (error) {
+      console.error('Error fetching communities:', error);
+    }
+  };
+
+  // Enterキーで検索
+  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      searchCommunities();  // 検索APIを呼び出す
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+
+    // 検索バーが空ならデフォルトで全てのコミュニティを取得
+    if (value === '') {
+      fetchCommunities();  // 空の状態でもAPIを呼び出す
+    }
+  };
+  // 初回ロード時にコミュニティすべて取得
+  useEffect(()=>{
+    fetchCommunities();
+  },[]);
+
+
+
 
   const fetchMyCommunities = async () => {
     try{
@@ -67,14 +111,12 @@ export function HomePage() {
       const data = await response.json();
       console.log('自分のコミュニティデータ:',data);
       setCommunities(data);
+      setNoResults(false);// 自分のコミュニティの取得時もリセット
     }catch(error){
       console.error('自分のコミュニティの取得に失敗しました',error);
     }
   };
   
-  useEffect(()=>{
-    fetchCommunities();
-  },[]);
 
   // コミュニティがクリックされたときに詳細ページに遷移
   const handleCommunityClick =(id: number) =>{
@@ -100,6 +142,9 @@ export function HomePage() {
                 className="w-full bg-gray-100 pl-8 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all duration-300"
                 placeholder="Search communities..."
                 type="search"
+                value={searchTerm}
+                onChange={handleInputChange}
+                onKeyDown={handleSearch}
               />
             </form>
             <CommunitySetupModal />
@@ -152,6 +197,12 @@ export function HomePage() {
         </aside>
         <main className="flex-1 p-6">
           <h2 className="text-2xl font-bold mb-6">Communities</h2>
+          {/* 検索結果がない場合の表示 */}
+          {noResults && (
+            <p className="text-lg text-red-500">
+              "{searchTerm}" が含まれるコミュニティは存在しません。
+            </p>
+          )}
            {/* 通知を表示するセクション */}
            {isNotificationsVisible && (
             <div>

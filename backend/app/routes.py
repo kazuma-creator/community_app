@@ -272,3 +272,29 @@ def get_notifications():
     } for post in recent_posts]
 
     return jsonify(notifications)
+  
+  
+@main.route('/api/search_communities', methods=['GET'])
+def search_communities():
+    print("search_communitiesにアクセスしました")
+    
+    search_query = request.args.get('q', '').strip()  # 検索ワードを取得し、余分な空白を削除
+    
+    try:
+        # 検索ワードが空の場合、全てのコミュニティを取得
+        if search_query == '':
+             communities = Community.query.all()
+        else:
+            # 部分一致でコミュニティ名を検索
+            communities = Community.query.filter(
+                Community.name.ilike(f'%{search_query}%')
+            ).all()
+
+        # コミュニティのデータをリスト形式で返す
+        community_data = [community.to_dict() for community in communities]
+        
+        return jsonify(community_data), 200
+    
+    except Exception as e:
+        print(f"Error during search: {e}")
+        return jsonify({'error': 'An error occurred during the search'}), 500
